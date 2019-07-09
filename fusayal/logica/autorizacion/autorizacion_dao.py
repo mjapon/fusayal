@@ -186,4 +186,5 @@ class TAutorizacionDao(BaseDao):
         tautorizacion.aut_secuencia_fin = form.get('aut_secuencia_fin')
         tautorizacion.cnt_id = cnt_id
 
+
         self.dbsession.add(tautorizacion)

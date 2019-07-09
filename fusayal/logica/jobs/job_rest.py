@@ -46,13 +46,19 @@ class TJobRest(DbComunView):
 
         tjobdao = TJobDao(self.dbsession)
         if job_id == 0:
-            tjobdao.crear(form=self.get_json_body(), user_crea=0)
+            tjobdao.crear(form=self.get_json_body(), user_crea=self.get_userid())
             return {'estado': 200, 'msg': u'Registro exitoso'}
 
         if accion == 'cambiar_estado':
             form = self.get_json_body()
-            tjobdao.actualizar_estado(job_id=job_id, estado=form['newestado'], user_actualiza=0)
+            tjobdao.actualizar_estado(job_id=job_id, estado=form['newestado'], user_actualiza=self.get_userid())
             return {'estado': 200, 'msg': u'Actualización exitosa'}
+
+        if accion == 'put_reporte':
+            form = self.get_json_body()
+            tjobdao.actualizar_plantilla(job_id=job_id, temp_id= form['temp_id'])
+            return {'estado': 200, 'msg': u'Reporte asignado correctamente'}
+
 
         return {'estado': 200, 'msg': 'Ninguna accion realizada'}
 

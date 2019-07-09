@@ -37,7 +37,8 @@ class TJobDao(BaseDao):
               tau.aut_secuencia_ini,
               tau.aut_secuencia_fin,
               tjob.job_nrocopias,
-              sjob.sjb_nombre
+              sjob.sjb_nombre,
+              sjob.sjb_id
               from tjob tjob
             join tautorizacion tau ON tau.aut_id = tjob.aut_id
             join tcontribuyente cnt ON tau.cnt_id = cnt.cnt_id
@@ -49,15 +50,16 @@ class TJobDao(BaseDao):
         tupla_desc = (
             'job_id',
             'aut_numero',
-                      'cnt_ruc',
-                      'cnt_razonsocial',
-                      'aut_fechaautorizacion',
-                      'serie',
-                      'td_nombre',
-                      'aut_secuencia_ini',
-                      'aut_secuencia_fin',
-                      'job_nrocopias',
-                      'sjb_nombre')
+            'cnt_ruc',
+            'cnt_razonsocial',
+            'aut_fechaautorizacion',
+            'serie',
+            'td_nombre',
+            'aut_secuencia_ini',
+            'aut_secuencia_fin',
+            'job_nrocopias',
+            'sjb_nombre',
+            'sjb_id')
 
         return self.all(sql, tupla_desc)
 
@@ -79,3 +81,8 @@ class TJobDao(BaseDao):
             tjob.job_estado = estado
             tjob.job_fechaactualizacion = datetime.now()
             tjob.user_actualiza = user_actualiza
+
+    def actualizar_plantilla(self, job_id, temp_id):
+        tjob = self.dbsession.query(TJob).filter(TJob.job_id == job_id).first()
+        if tjob is not None:
+            tjob.temp_id = temp_id

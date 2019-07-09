@@ -34,6 +34,7 @@ class TJob(Declarative, JsonAlchemy):
     job_estado = Column(Integer, nullable=False)
     job_fechaactualizacion = Column(DateTime, nullable=False)
     job_nrocopias = Column(Integer, nullable=False)
+    temp_id = Column(Integer)
     cnt_id = Column(Integer, nullable=False)
     user_crea = Column(Integer, nullable=False)
     user_actualiza = Column(Integer)

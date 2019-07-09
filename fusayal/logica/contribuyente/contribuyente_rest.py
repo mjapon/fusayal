@@ -3,11 +3,11 @@
 Fecha de creacion 3/25/19
 @autor: mjapon
 """
-import logging
+
+from cornice.resource import resource
 
 from fusayal.logica.contribuyente.contribuyente_dao import TContribuyenteDao
 from fusayal.utils.pyramidutil import DbComunView
-from cornice.resource import resource
 
 
 @resource(path="/rest/contribuyente/{cnt_id}", collection_path="/rest/contribuyente")
@@ -16,13 +16,24 @@ class ContribuyenteRest(DbComunView):
     def collection_get(self):
         contrib_dao = TContribuyenteDao(self.dbsession)
         contribs = contrib_dao.listar()
-        cols = [{'name': 'cnt_ruc', 'displayName': 'RUC'},
-                {'name': 'cnt_razonsocial', 'displayName': 'Razón social'},
-                {'name': 'cnt_telf', 'displayName': 'Telf.'},
-                {'name': 'cnt_email', 'displayName': 'Email'},
-                {'name': 'cls_nombre', 'displayName': 'Tipo'},
-                {'name': 'cnt_nrocntespecial', 'displayName': 'Cont. Especial'},
-                {'name': 'ocontab', 'displayName': 'Obl contab.'}]
+        cols = [{'prop': 'cnt_ruc', 'label': 'RUC'},
+                {'prop': 'cnt_razonsocial', 'label': 'Razón social'},
+                {'prop': 'cnt_telf', 'label': 'Telf.'},
+                {'prop': 'cnt_email', 'label': 'Email'},
+                {'prop': 'cls_nombre', 'label': 'Tipo'},
+                {'prop': 'cnt_nrocntespecial', 'label': 'Cont. Especial'},
+                {'prop': 'ocontab', 'label': 'Obl contab.'}]
+
+        accion = None
+        if 'accion' in self.request.params:
+            accion = self.request.params['accion']
+            if accion == 'find':
+                ruc = self.request.params['ruc']
+                contrib = contrib_dao.find_by_ruc(ruc)
+                if contrib is None:
+                    return {'estado': 404}
+                else:
+                    return {'estado': 200, 'contrib': contrib}
 
         return {'estado': 200, 'items': contribs, 'cols': cols}
 
@@ -39,15 +50,15 @@ class ContribuyenteRest(DbComunView):
 
                 return {'estado': 200,
                         'form': form,
-                        'tiposcontrib':tipos_contrib}
+                        'tiposcontrib': tipos_contrib}
 
     def post(self):
         contrib_dao = TContribuyenteDao(self.dbsession)
         cnt_id = self.get_request_matchdict('cnt_id')
         msg = 'Operación exitosa'
         if int(cnt_id) == 0:
-            contrib_dao.crear(form=self.get_json_body())
+            contrib_dao.crear(form=self.get_json_body(), user_crea=self.get_userid())
             return {'estado': 200, 'msg': msg}
         else:
-            contrib_dao.editar(form=self.get_json_body())
+            contrib_dao.editar(form=self.get_json_body(), user_edit=self.get_userid())
             return {'estado': 200, 'msg': msg}

@@ -11,31 +11,29 @@ from cornice.resource import resource
 
 log = logging.getLogger(__name__)
 
-@resource(path="/rest/cuotas/{socioid}", collection_path="/rest/cuotas")
+
+@resource(path="/rest/plantillas/{tempid}", collection_path="/rest/plantillas")
 class PlantillasRest(DbComunView):
 
-    def __init__(self, request):
-        DbComunView.__init__(self, request)
-        self.plantillas_dao = TPlantillasDao(self.dbsession)
+    def collection_get(self):
+        plantillas_dao = TPlantillasDao(self.dbsession)
+
+        items = plantillas_dao.listar()
+        cols = [
+            {'name': 'temp_id', 'displayName': 'Codigo'},
+            {'name': 'temp_name', 'displayName': 'Nombre'}
+        ]
+        return {'status': 200, 'items': items, 'cols': cols}
 
     def get(self):
-        if 'form' in self.request.params:
-            pass
+        temp_id = self.request.matchdict['tempid']
+        plantillas_dao = TPlantillasDao(self.dbsession)
 
-        items = self.plantillas_dao.listar()
-        return {'status':200, 'items':items}
+        tplantilla = plantillas_dao.find_bycod(temp_id)
+        if tplantilla is not None:
+            return {'status':200, 'form':tplantilla.__json__()}
+        else:
+            return {'status': 400}
 
     def post(self):
-        form = self.get_json_body()
-        res = self.cuotas_dao.registrar_cuota(
-            socio_id=form['socio_id'],
-            tipo_cuota=form['tipo'],
-            anio=form['anio'],
-            mes=form['mes'],
-            monto=form['monto'],
-            socio_id_reg=self.gsession('socioid'),
-            path_compro='',
-            obs=form['obs']
-        )
-
-        return {'status':200, 'res':res}
+        return {'status':200, 'res':'Implementado'}
