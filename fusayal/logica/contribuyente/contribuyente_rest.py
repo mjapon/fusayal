@@ -10,19 +10,20 @@ from fusayal.logica.contribuyente.contribuyente_dao import TContribuyenteDao
 from fusayal.utils.pyramidutil import DbComunView
 
 
-@resource(path="/rest/contribuyente/{cnt_id}", collection_path="/rest/contribuyente")
+@resource(path="/rest/contribuyente/{cnt_id}",
+          collection_path="/rest/contribuyente", cors_origins=('*',))
 class ContribuyenteRest(DbComunView):
 
     def collection_get(self):
         contrib_dao = TContribuyenteDao(self.dbsession)
         contribs = contrib_dao.listar()
-        cols = [{'prop': 'cnt_ruc', 'label': 'RUC'},
-                {'prop': 'cnt_razonsocial', 'label': 'Razón social'},
-                {'prop': 'cnt_telf', 'label': 'Telf.'},
-                {'prop': 'cnt_email', 'label': 'Email'},
-                {'prop': 'cls_nombre', 'label': 'Tipo'},
-                {'prop': 'cnt_nrocntespecial', 'label': 'Cont. Especial'},
-                {'prop': 'ocontab', 'label': 'Obl contab.'}]
+        cols = [{'field': 'cnt_ruc', 'header': 'RUC'},
+                {'field': 'cnt_razonsocial', 'header': 'Razón social'},
+                {'field': 'cnt_telf', 'header': 'Telf.'},
+                {'field': 'cnt_email', 'header': 'Email'},
+                {'field': 'cls_nombre', 'header': 'Tipo'},
+                {'field': 'cnt_nrocntespecial', 'header': 'Cont. Especial'},
+                {'field': 'ocontab', 'header': 'Obl contab.'}]
 
         accion = None
         if 'accion' in self.request.params:
