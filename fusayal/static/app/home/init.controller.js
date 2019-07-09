@@ -58,8 +58,8 @@
         }
 
         function goReportes() {
-            //$state.go("reportes_list");
-            $state.go("upload");
+            $state.go("reportes_list");
+            // $state.go("upload");
         }
 
 

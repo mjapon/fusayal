@@ -33,8 +33,7 @@ var IsyplusApp = angular.
         $httpProvider.interceptors.push('AnimHttpInterceptor');
 
         //toaster config
-        toastr.options = {"timeOut": "3000","positionClass": "toast-bottom-left"};
-
+        toastr.options = {"timeOut": "4000","positionClass": "toast-bottom-right"};
 
         /*
           $provide.decorator('$exceptionHandler', ['$log', '$delegate',
@@ -261,6 +260,13 @@ var IsyplusApp = angular.
         vm.listar = listar;
         vm.editar = editar;
         vm.showModalDetalles = showModalDetalles;
+        vm.onCheckClick = onCheckClick;
+
+        vm.setupgrid = {};
+        vm.setupgrid.checks = {hideColumncheck: true};
+        vm.onFilaCredClick = onFilaCredClick;
+
+        // vm.setupgrid.checks.hideColumncheck = true;
 
         init();
 
@@ -298,6 +304,23 @@ var IsyplusApp = angular.
         function showModalDetalles() {
             ModalServ.show('modalDetallesContrib');
         }
+
+        function onCheckClick(fila) {
+            console.log("on check clic-->");
+            console.log(fila);
+            vm.selectedItem = fila;
+        }
+        function onRowClick(a,b) {
+            console.log("on row click");
+            console.log(a);
+            console.log(b);
+        }
+
+        function onFilaCredClick(a,b) {
+            console.log("onFilaCredClick");
+            console.log(a);
+            console.log(b);
+        }
     }
     ContribCntrl.$inject = ['$scope', '$state', 'ContribuyenteServ', 'gridService', 'ModalServ'];
 })();
@@ -321,16 +344,23 @@ var IsyplusApp = angular.
     angular.module("isyplus")
         .factory("ContribuyenteServ", ContribuyenteServ);
 
-    function ContribuyenteServ($resource){
+    function ContribuyenteServ($resource) {
         return $resource("/rest/contribuyente/:cnt_id",
-            {cnt_id:'@cnt_id'},{
+            {cnt_id: '@cnt_id'}, {
 
-            getForm:{
-                method: 'GET',
-                params:{
-                    accion:'form'
+                getForm: {
+                    method: 'GET',
+                    params: {
+                        accion: 'form'
+                    }
+                },
+
+                findByRuc:{
+                    method: 'GET',
+                    params : {
+                        accion: 'find'
+                    }
                 }
-            }
 
             });
     }
@@ -342,31 +372,35 @@ var IsyplusApp = angular.
     angular.module("isyplus")
         .controller("ContribFormCntrl", ContribFormCntrl);
 
-    function ContribFormCntrl($scope, $state,$stateParams, focusService, ContribuyenteServ, NotifServ){
+    function ContribFormCntrl($scope, $state, $stateParams, focusService, ContribuyenteServ, NotifServ) {
 
         var vm = $scope;
 
-        vm.form = {'cnt_id':0};
+        vm.form = {'cnt_id': 0};
         vm.tiposcontrib = [];
+        vm.existeContrib = false;
+
         init();
 
         vm.guardar = guardar;
         vm.cancelar = cancelar;
-        
+
+        vm.checkExistContrib = checkExistContrib;
+
         function init() {
-            var res = ContribuyenteServ.getForm({cnt_id:$stateParams.cnt_id},function(){
-                if (res.estado === 200){
-                    vm.form =res.form;
+            var res = ContribuyenteServ.getForm({cnt_id: $stateParams.cnt_id}, function () {
+                if (res.estado === 200) {
+                    vm.form = res.form;
                     vm.tiposcontrib = res.tiposcontrib;
 
-                }                
+                }
             });
             focusService.setFocus("cnt_ruc", 1000);
         }
-        
+
         function guardar() {
-            var res = ContribuyenteServ.save(vm.form,function () {
-                if (res.estado === 200){
+            var res = ContribuyenteServ.save(vm.form, function () {
+                if (res.estado === 200) {
                     NotifServ.success(res.msg);
                     goToList();
                 }
@@ -379,6 +413,24 @@ var IsyplusApp = angular.
 
         function goToList() {
             $state.go("contribs_list");
+        }
+
+        function checkExistContrib() {
+            console.log("checkExistContrib-->");
+            console.log(vm.form.cnt_id);
+            console.log(vm.form.cnt_id > 0);
+            if (vm.form.cnt_ruc.length > 10) {
+                if (vm.form.cnt_id === 0) {
+                    var res = ContribuyenteServ.findByRuc({ruc: vm.form.cnt_ruc}, function () {
+                        if (res.estado === 200) {
+                            NotifServ.warning('El contribuyente ya esta registrado');
+                            vm.form = res.contrib;
+                            vm.existeContrib = true;
+
+                        }
+                    });
+                }
+            }
         }
     }
     ContribFormCntrl.$inject = ['$scope', '$state', '$stateParams', 'focusService', 'ContribuyenteServ', 'NotifServ'];
@@ -625,8 +677,8 @@ var IsyplusApp = angular.
         }
 
         function goReportes() {
-            //$state.go("reportes_list");
-            $state.go("upload");
+            $state.go("reportes_list");
+            // $state.go("upload");
         }
 
 
@@ -729,15 +781,27 @@ var IsyplusApp = angular.
     angular.module("isyplus")
         .controller("JobCntrl", JobCntrl);
 
-    function JobCntrl($scope, JobService, gridService, $state, ModalServ, NotifServ, swalService) {
+    function JobCntrl($scope, JobService, gridService, $state, ModalServ, NotifServ, swalService, ReportesServ) {
 
         var vm = $scope;
 
         vm.selectedItem = {};
+        vm.selectedReport = 0;
 
         vm.crear = crear;
         vm.listar = listar;
         vm.cambiarEstado = cambiarEstado;
+        vm.setPlantilla = setPlantilla;
+        vm.aceptarModal = aceptarModal;
+        vm.imprimir = imprimir;
+        vm.selectPlantilla = selectPlantilla;
+        vm.selectDocToPrint = selectDocToPrint;
+        vm.showModalImprmir = showModalImprmir;
+        vm.reportar = reportar;
+        vm.reimprimir = reimprimir;
+
+        vm.repgrid = {};
+        vm.repgrid.selectedItem = {};
 
         init();
 
@@ -751,6 +815,23 @@ var IsyplusApp = angular.
             $state.go('job_form', {job_id: 0});
         }
 
+        var columnDefs = [
+        {headerName: "Make", field: "make"},
+        {headerName: "Model", field: "model"},
+        {headerName: "Price", field: "price"}
+    ];
+
+    var rowData = [
+        {make: "Toyota", model: "Celica", price: 35000},
+        {make: "Ford", model: "Mondeo", price: 32000},
+        {make: "Porsche", model: "Boxter", price: 72000}
+    ];
+
+    $scope.gridOptions2 = {
+        columnDefs: columnDefs,
+        rowData: rowData
+    };
+
         function listar() {
             var res = JobService.get(function () {
                 if (res.estado === 200) {
@@ -759,7 +840,6 @@ var IsyplusApp = angular.
                 }
             });
         }
-
 
         function rowTemplate() {    //custom rowtemplate to enable double click and right click menu options
             return '<div ng-dblclick="grid.appScope.rowDblClick(row)"  ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }"  ui-grid-cell></div>'
@@ -776,6 +856,21 @@ var IsyplusApp = angular.
 
         function hideModalDetalles() {
             ModalServ.hide('modalDetallesJob');
+        }
+
+        function auxCambiarEstado(newEstado, notif) {
+            var params = {
+                job_id: vm.selectedItem.job_id,
+                newestado: newEstado
+            };
+            var res = JobService.cambiarEstado(params, function () {
+                if (res.estado === 200) {
+                    if (notif) {
+                        NotifServ.success(res.msg);
+                    }
+                    listar();
+                }
+            });
         }
 
         function cambiarEstado(estado) {
@@ -795,8 +890,69 @@ var IsyplusApp = angular.
                 }
             }, 'Cambiar estado del pedido');
         }
+
+        function setPlantilla() {
+            var res = ReportesServ.get(function () {
+                if (res.status === 200) {
+                    $scope.repgrid.columnDefs = res.cols;
+                    $scope.repgrid.data = res.items;
+                }
+                ModalServ.show('modalSelPlant');
+            });
+        }
+
+        function selectPlantilla(plantilla) {
+            vm.repgrid.selectedItem = plantilla;
+        }
+
+        function selectDocToPrint(codReport, tipocopia) {
+            console.log('doc to print');
+            console.log(tipocopia);
+            vm.selectedReport = codReport;
+            imprimir(codReport);
+            auxCambiarEstado(6);
+        }
+
+        function aceptarModal() {
+            console.log(vm.repgrid.selectedItem);
+            var res = JobService.putPlantilla({
+                job_id: vm.selectedItem.job_id,
+                temp_id: vm.repgrid.selectedItem.temp_id
+            }, function () {
+                if (res.estado == 200) {
+                    NotifServ.success(res.msg);
+                    ModalServ.hide('modalSelPlant');
+                }
+            });
+        }
+
+        function reportar() {
+            cambiarEstado(2);
+        }
+
+        function reimprimir() {
+            alert('reimprimir');
+        }
+
+        function showModalImprmir() {
+            ModalServ.show('modalSelTipoPrint');
+        }
+
+        function imprimir(tipocopia) {
+            var temp_id = vm.repgrid.selectedItem.temp_id;
+            var desde = vm.selectedItem.aut_secuencia_ini;
+            var hasta = vm.selectedItem.aut_secuencia_fin;
+            var jobid = vm.selectedItem.job_id;
+            var url = "http://localhost:8080/imprentas_war/ReporteServlet?desde=" + desde + "&hasta=" + hasta + "&codrep=" + temp_id+"&tipocopia="+tipocopia + "&jobid="+jobid;
+            console.log('url-->');
+            console.log(url);
+            window.open(url, "mywindow", "status=1,toolbar=1");
+        }
+
+
+
     }
-    JobCntrl.$inject = ['$scope', 'JobService', 'gridService', '$state', 'ModalServ', 'NotifServ', 'swalService'];
+    JobCntrl.$inject = ['$scope', 'JobService', 'gridService', '$state', 'ModalServ', 'NotifServ', 'swalService', 'ReportesServ'];
 })();
 (function () {
     'use strict';
@@ -831,7 +987,14 @@ var IsyplusApp = angular.
                     params: {
                         accion: 'cambiar_estado'
                     }
+                },
+                putPlantilla: {
+                    method: 'POST',
+                    params: {
+                        accion: 'put_reporte'
+                    }
                 }
+
             });
     }
     JobService.$inject = ['$resource'];
@@ -1000,17 +1163,53 @@ var IsyplusApp = angular.
     angular.module("isyplus")
         .controller("ReportesCntrl", ReportesCntrl);
 
-    function ReportesCntrl($scope) {
+    function ReportesCntrl($scope, ReportesServ, gridService, $state) {
 
         var vm = $scope;
+
+        vm.listar = listar;
+        vm.crear = crear;
+        vm.editar = editar;
+
+        vm.selectedItem = {};
+
+        gridService.initGrid(vm);
 
         init();
 
         function init() {
             console.log("Reportes Cntrl Init executed-->");
+            listar();
+        }
+
+        function listar(){
+            console.log('Se ejecuta accion listar');
+
+            var res = ReportesServ.get(function(){
+                if (res.status === 200){
+                    $scope.gridOptions.columnDefs = res.cols;
+                    $scope.gridOptions.data = res.items;
+                }
+            });
+
+            /*var res = ReportesServ.get(function () {
+                console.log("Respuesta del servidor es");
+                console.log(res);
+                if (res.status == 200) {
+                    vm.lista = res.lista;
+                }
+            });*/
+        }
+
+        function crear() {
+            $state.go('upload',{temp_id:0});
+        }
+
+        function editar() {
+            $state.go('upload',{temp_id:vm.selectedItem.temp_id});
         }
     }
-    ReportesCntrl.$inject = ['$scope'];
+    ReportesCntrl.$inject = ['$scope', 'ReportesServ', 'gridService', '$state'];
 
 })();
 (function () {
@@ -1033,11 +1232,26 @@ var IsyplusApp = angular.
 (function () {
     'use strict';
     angular.module("isyplus")
+     .factory("ReportesServ", ReportesServ);
+
+    function ReportesServ($resource) {
+
+        return $resource("/rest/plantillas/:temp_id", {temp_id:'@temp_id'}, {
+
+
+        });
+    }
+    ReportesServ.$inject = ['$resource'];
+
+})();
+(function () {
+    'use strict';
+    angular.module("isyplus")
 
     .config(config);
     function config($stateProvider){
         $stateProvider.state('upload', {
-            url : '/upload/',
+            url : '/upload/:temp_id',
             templateUrl: 'static/app/uploadfile/upload.html?v=' + globalgsvapp,
             controller: 'UploadCntrl'
         });
@@ -1052,23 +1266,37 @@ var IsyplusApp = angular.
 (function () {
     'use strict';
     angular.module("isyplus")
-
         .controller("UploadCntrl", UploadCntrl);
 
-    function UploadCntrl($scope, NotifServ, $state) {
-
+    function UploadCntrl($scope, NotifServ, $state, $stateParams, ReportesServ) {
         var vm = $scope;
-        vm.form = {nombreArchivo: ''};
-
+        vm.form = {nombreArchivo: 'prueba'};
         init();
 
+        vm.cancelar = cancelar;
+
         function init() {
-            console.log("upload controller init-->");
+            var temp_id = $stateParams['temp_id'];
+            var int_tempid = parseInt(temp_id, 10);
+            console.log(int_tempid);
+            if ( int_tempid == 0) {
+                vm.form = {temp_id:0, temp_name: ''};
+            }
+            else{
+                var res = ReportesServ.get({temp_id: temp_id}, function () {
+                    if (res.status == 200) {
+                        vm.form = res.form;
+                    }
+                });
+            }
         }
 
-
+        function cancelar() {
+            // NotifServ.info('Accion cancelar ejecutado');
+            $state.go("reportes_list");
+        }
     }
-    UploadCntrl.$inject = ['$scope', 'NotifServ', '$state'];
+    UploadCntrl.$inject = ['$scope', 'NotifServ', '$state', '$stateParams', 'ReportesServ'];
 
 })();
 (function () {

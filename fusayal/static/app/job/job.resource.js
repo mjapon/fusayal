@@ -17,7 +17,14 @@
                     params: {
                         accion: 'cambiar_estado'
                     }
+                },
+                putPlantilla: {
+                    method: 'POST',
+                    params: {
+                        accion: 'put_reporte'
+                    }
                 }
+
             });
     }
 

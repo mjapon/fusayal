@@ -12,9 +12,22 @@
 </div>
 
 <br/>
-<div>
+<!--?<div>
     <div ui-grid="gridOptions" ui-grid-selection ui-grid-resize-columns class="grid"></div>
-</div>
+</div>-->
+
+
+<ng-table titulo="Contribuyentes"
+          lstdatos=gridOptions.data
+          lstcols=gridOptions.columnDefs
+          rowopc="{func: onFilaCredClick}"
+          scroll=false
+          striped=false
+          busq=true
+          checks="{model: 'marcado', func: onCheckClick}"
+          form=setupgrid
+          orderby="">
+</ng-table>
 
 
 <div class="modal fade" id="modalDetallesContrib" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">

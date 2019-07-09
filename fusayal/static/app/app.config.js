@@ -12,8 +12,7 @@
         $httpProvider.interceptors.push('AnimHttpInterceptor');
 
         //toaster config
-        toastr.options = {"timeOut": "3000","positionClass": "toast-bottom-left"};
-
+        toastr.options = {"timeOut": "4000","positionClass": "toast-bottom-right"};
 
         /*
           $provide.decorator('$exceptionHandler', ['$log', '$delegate',

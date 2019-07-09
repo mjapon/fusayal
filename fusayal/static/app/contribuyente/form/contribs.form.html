@@ -9,7 +9,11 @@
                     RUC:
                 </div>
                 <div class="col-md-8">
-                    <input type="text" id="cnt_ruc" class="form-control" ng-model="form.cnt_ruc" ng-required="true" input-mask="{mask:'9999999999999'}">
+                    <input type="text" id="cnt_ruc" class="form-control" ng-model="form.cnt_ruc"
+                           ng-required="true"
+                           input-mask="{mask:'9999999999999'}"
+                           ng-disabled="form.cnt_id>0"
+                           ng-blur="checkExistContrib()" >
                 </div>
             </div>
 
@@ -99,7 +103,7 @@
             <br/>
             <div class="row">
                 <div class="col-md-12">
-                    <button class="btn btn-primary" type="button" ng-click="guardar()">Guardar</button>
+                    <button class="btn btn-primary" type="button" ng-click="guardar()" ng-disabled="existeContrib">Guardar</button>
                     <button class="btn btn-default" ng-click="cancelar()"> Cancelar</button>
                 </div>
             </div>

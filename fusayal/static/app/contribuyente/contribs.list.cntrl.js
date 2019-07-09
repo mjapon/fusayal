@@ -14,6 +14,13 @@
         vm.listar = listar;
         vm.editar = editar;
         vm.showModalDetalles = showModalDetalles;
+        vm.onCheckClick = onCheckClick;
+
+        vm.setupgrid = {};
+        vm.setupgrid.checks = {hideColumncheck: true};
+        vm.onFilaCredClick = onFilaCredClick;
+
+        // vm.setupgrid.checks.hideColumncheck = true;
 
         init();
 
@@ -50,6 +57,23 @@
 
         function showModalDetalles() {
             ModalServ.show('modalDetallesContrib');
+        }
+
+        function onCheckClick(fila) {
+            console.log("on check clic-->");
+            console.log(fila);
+            vm.selectedItem = fila;
+        }
+        function onRowClick(a,b) {
+            console.log("on row click");
+            console.log(a);
+            console.log(b);
+        }
+
+        function onFilaCredClick(a,b) {
+            console.log("onFilaCredClick");
+            console.log(a);
+            console.log(b);
         }
     }
 })();
