@@ -26,7 +26,7 @@ requires = [
     'cornice',
     'pyramid_beaker',
     'pyramid_mailer',
-    'reportbro-lib'
+    #'reportbro-lib'
 
 ]
 

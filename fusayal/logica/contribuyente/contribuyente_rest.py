@@ -54,6 +54,7 @@ class ContribuyenteRest(DbComunView):
                         'tiposcontrib': tipos_contrib}
 
     def post(self):
+        print 'Entra en el post-->'
         contrib_dao = TContribuyenteDao(self.dbsession)
         cnt_id = self.get_request_matchdict('cnt_id')
         msg = 'Operación exitosa'
