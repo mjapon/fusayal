@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" ng-app="isyplus">
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <link rel="icon" href="../../../../favicon.ico">
+
+      <title>Sys Imprentas</title>
+      <!--
+      <link href="{{request.static_url('fusayal:static/bower_components/bootstrap/dist/css/bootstrap.css')}}" rel="stylesheet">
+      -->
+
+      <!-- Custom styles for this template -->
+      <link rel="stylesheet" href="static/dist/css/vendor.min.css?v0.1"/>
+      <link rel="stylesheet" href="static/dist/css/app.min.css?v0.23"/>
+
+      <link rel="stylesheet" href="static/bower_components/font-awesome/css/all.css?v=4.4.0"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css"/>
+
+
+
+  </head>
+
+  <body onload="if(history.length>0)history.go(+1)" ng-cloak>
+
+
+    <div id="ajax_anim" class='ajax_anim_modal text-center'>
+        <br />
+        <img src='static/img/loading13.gif' alt='' />
+        <br />
+        <span class='text-info' id="divajax_anim_msg">
+            Espere...
+        </span>
+    </div>
+
+    <!-- <div ng-controller="InitCntrl"> -->
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+              <a class="navbar-brand" href="{{request.route_url('initApp')}}" ng-click="exitApp()">SYS Imprentas</a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <!--
+                  <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                  </li>
+                  -->
+                </ul>
+                  <!--
+                <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+                -->
+
+                  <form class="form-inline my-2 my-lg-0">
+                      <!--
+                      <button ng-click="goFormIngreso()" ng-show="!isUsserLogged" class="btn btn-primary"> Ingresar </button>
+                      <button ng-click="exitApp()" ng-show="isUsserLogged" class="btn btn-primary"> Salir </button>
+                      -->
+                      {% if request.session['userlogged'] == 1 %}
+                          <span>{{request.session['us_nomapel']}}</span> &nbsp;&nbsp;&nbsp;
+
+                          <a href="{{request.route_url('logoutApp')}}">Salir</a>
+                      {% else %}
+                          <a href="{{request.route_url('loginApp')}}">Ingresar</a>
+                      {% endif %}
+
+                  </form>
+              </div>
+          </div>
+    </nav>
+
+    <main role="main" class="container-fluid">
+
+        <div id="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+
+        <!--
+        <div id="reportbro"></div>
+        -->
+
+
+
+    </main><!-- /.container -->
+
+
+
+
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+      <!--
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    -->
+    <!--
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+
+    <script src="../../assets/js/vendor/popper.min.js"></script>
+
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    -->
+    {#<script src="{{request.static_url('fusayal:static/bower_components/bootstrap/dist/js/bootstrap.js')}}"></script>#}
+      <!--
+    <script src="static/dist/js/vendor.js?v=0.1"></script>
+    <script src="static/js/utils.js?v=0.1"></script>
+    -->
+
+      <script src="static/dist/js/vendor.js?v=0.1"></script>
+      <script src="static/js/utils.js?v=0.1"></script>
+
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.20/autosize.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.8.0/JsBarcode.all.min.js"></script>
+      <script src="static/node_modules/reportbro-designer/dist/reportbro.js?v=0.2"></script>
+      -->
+
+    <script type="text/javascript" charset="utf-8">
+        var globalgsvapp = '{{vapp}}';
+        var globalEmpEsquema = '{{emp_esquema}}';
+        var globalUserLogged = '{{user_logged}}'
+        $(function(){
+            setupJQuery();
+        });
+    </script>
+
+    <!--
+    <script type="text/javascript">
+       $(document).ready(function() {
+          $("#reportbro").reportBro({
+              patternLocale:'es'
+          });
+       });
+    </script>
+    -->
+
+    <script src="static/dist/js/app.js?v={{vapp}}"></script>
+    <script src="//localhost:1337/livereload.js"></script>
+
+
+
+  </body>
+</html>

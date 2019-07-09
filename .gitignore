@@ -1,0 +1,5 @@
+.idea/
+fusayal/.idea/
+fusayal/static/bower_components/
+fusayal/static/node_modules/
+*.pyc
